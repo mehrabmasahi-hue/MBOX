@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#07111f">
+<title>رانندگی بی‌پایان | M BOX</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07111f;color:#fff;font-family:Tahoma,system-ui,sans-serif}
+#game{display:block;width:100vw;height:100vh;background:#0b1724}
+.hud{position:fixed;inset:12px 14px auto;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;pointer-events:none;z-index:2}
+.brand,.stats{background:#07111fce;border:1px solid #ffffff25;border-radius:14px;padding:9px 13px;backdrop-filter:blur(8px);box-shadow:0 8px 30px #0005}
+.brand b{display:block;color:#ffd166;font-size:clamp(13px,2vw,19px)}.brand small{color:#a9bdd1;font-size:10px}
+.stats{display:flex;gap:14px;direction:rtl}.stat small{display:block;color:#9db2c8;font-size:10px}.stat strong{font-size:clamp(15px,2.4vw,23px);color:#fff;font-variant-numeric:tabular-nums}
+.players{position:fixed;bottom:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap;max-width:70%;z-index:2;pointer-events:none}
+.player{background:#07111fdb;border:1px solid #ffffff2b;border-radius:10px;padding:6px 9px;font-size:11px;min-width:85px}.player b{display:block;font-size:14px}
+.overlay{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(#07111f99,#07111fcc);z-index:5;padding:20px;text-align:center}
+.panel{max-width:520px;width:min(100%,520px);padding:25px;border:1px solid #ffffff2a;border-radius:24px;background:#0b1b2ceF;box-shadow:0 20px 80px #0009}
+.panel h1{margin:0 0 8px;color:#ffd166;font-size:clamp(26px,6vw,44px)}.panel p{color:#c0d1df;line-height:1.9;font-size:14px}
+.panel button{border:0;border-radius:13px;padding:13px 24px;background:linear-gradient(135deg,#ffbd4a,#ff7b35);color:#211305;font-weight:900;font-size:16px}
+.hint{color:#90a7bd!important;font-size:11px!important}
+@media(max-width:600px){.hud{inset:7px 7px auto}.brand,.stats{padding:7px 9px}.stats{gap:8px}.players{bottom:7px;left:7px}}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div class="hud">
+ <div class="brand"><b>🏁 رانندگی بی‌پایان</b><small>M BOX · 123T EDITION</small></div>
+ <div class="stats">
+  <div class="stat"><small>مسافت</small><strong id="distance">۰ km</strong></div>
+  <div class="stat"><small>سرعت</small><strong id="speed">۰</strong></div>
+  <div class="stat"><small>رکورد</small><strong id="record">۰ km</strong></div>
+ </div>
+</div>
+<div class="players" id="players"></div>
+<div class="overlay" id="intro">
+ <div class="panel">
+  <h1>رانندگی بی‌پایان</h1>
+  <p>جاده هیچ‌وقت تمام نمی‌شود! آزادانه رانندگی کن، از خودروها سبقت بگیر، سکه جمع کن و رکورد مسافتت را بشکن.</p>
+  <p><b>کنترل دسته:</b> جهت‌ها برای فرمان و سرعت · A گاز · B ترمز · X نیترو · Y ترمز دستی</p>
+  <button id="go">شروع رانندگی</button>
+  <p class="hint">برای ۱ تا ۴ بازیکن · بدون اینترنت · مسیر بی‌پایان</p>
+ </div>
+</div>
+<script>
+(()=>{
+'use strict';
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id);
+let W=0,H=0,dpr=1,started=false,world=0,elapsed=0,traffic=[],coins=[],players={},last=0,shake=0;
+const colors=['#43d9ff','#ff5d73','#b6f36b','#c28bff'];
+const fa=n=>Math.floor(n).toLocaleString('fa-IR');
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=Math.floor(W*dpr);canvas.height=Math.floor(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',resize);resize();
+function player(id){if(!players[id])players[id]={id,x:0,speed:0,score:0,nitro:100,boost:0,brake:0,steer:0,alive:true,color:colors[(Number(id.slice(1))-1)%4]||colors[0],best:0};return players[id]}
+function input(id,key,down){const p=player(id);if(key==='LEFT')p.steer=down?-1:(p.steer===-1?0:p.steer);if(key==='RIGHT')p.steer=down?1:(p.steer===1?0:p.steer);if(key==='UP'||key==='A')p.accel=down;if(key==='DOWN'||key==='B')p.brake=down;if(key==='X'&&down&&p.nitro>8){p.boost=.85;p.nitro=Math.max(0,p.nitro-30)}if(key==='Y'&&down)p.handbrake=.35}
+addEventListener('message',e=>{const d=e.data;if(d?.type!=='MBOX_INPUT'||!d.player_id||!d.input)return;input(d.player_id,d.input.button,d.input.action==='down')});
+const keys={ArrowLeft:'LEFT',ArrowRight:'RIGHT',ArrowUp:'UP',ArrowDown:'DOWN',a:'A',b:'B',x:'X',y:'Y'};
+addEventListener('keydown',e=>{const k=keys[e.key]||keys[e.key.toLowerCase()];if(k){e.preventDefault();input('p1',k,true)}});addEventListener('keyup',e=>{const k=keys[e.key]||keys[e.key.toLowerCase()];if(k){e.preventDefault();input('p1',k,false)}});
+function road(){const horizon=H*.22,base=H*.98,roadW=Math.min(W*.78,850),cx=W/2;ctx.fillStyle='#172b29';ctx.fillRect(0,0,W,H); // desert
+ for(let i=0;i<24;i++){let y=((i*83+world*.7)%(H+80))-30;ctx.fillStyle=i%2?'#1c3430':'#203a32';ctx.fillRect(0,y,W,2)}
+ // road perspective trapezoid
+ ctx.beginPath();ctx.moveTo(cx-roadW*.12,horizon);ctx.lineTo(cx+roadW*.12,horizon);ctx.lineTo(cx+roadW*.56,base);ctx.lineTo(cx-roadW*.56,base);ctx.closePath();ctx.fillStyle='#303943';ctx.fill();
+ // shoulders
+ ctx.strokeStyle='#e9d7a0';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(cx-roadW*.12,horizon);ctx.lineTo(cx-roadW*.56,base);ctx.moveTo(cx+roadW*.12,horizon);ctx.lineTo(cx+roadW*.56,base);ctx.stroke();
+ // dashed lane markers
+ const offset=(world*1.7)%70;
+ for(let y=horizon-offset;y<base;y+=70){let t=(y-horizon)/(base-horizon),half=roadW*(.12+.44*t);ctx.strokeStyle='#d7dce0aa';ctx.lineWidth=2+4*t;ctx.beginPath();ctx.moveTo(cx-half/3,y);ctx.lineTo(cx-half/3,y+28*t+5);ctx.moveTo(cx+half/3,y);ctx.lineTo(cx+half/3,y+28*t+5);ctx.stroke()}
+ // distant sun
+ const g=ctx.createRadialGradient(cx,H*.13,5,cx,H*.13,100);g.addColorStop(0,'#ffd98a88');g.addColorStop(1,'#ffd98a00');ctx.fillStyle=g;ctx.fillRect(cx-110,H*.02,220,210);
+ return {cx,horizon,base,roadW};
+}
+function spawn(){const lane=(Math.random()*3-1);traffic.push({z:0,lane,w:.10+Math.random()*.025,color:['#e85d5d','#e5e8ec','#f4a340','#9a9fa8'][Math.floor(Math.random()*4)],type:Math.random()<.18?'truck':'car'});if(Math.random()<.65)coins.push({z:0,lane:Math.round((Math.random()*2-1)*2)/2})}
+function car(x,y,w,h,color,angle=0){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.shadowColor='#0009';ctx.shadowBlur=12;ctx.shadowOffsetY=6;ctx.fillStyle='#080d13';ctx.fillRect(-w*.48,-h*.42,w*.96,h*.84);ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+ const grad=ctx.createLinearGradient(-w/2,0,w/2,0);grad.addColorStop(0,'#111923');grad.addColorStop(.5,color);grad.addColorStop(1,'#101722');ctx.fillStyle=grad;ctx.beginPath();ctx.roundRect(-w*.39,-h*.5,w*.78,h,Math.min(w*.2,9));ctx.fill();
+ ctx.fillStyle='#9ed5e9';ctx.beginPath();ctx.roundRect(-w*.28,-h*.29,w*.56,h*.22,5);ctx.fill();ctx.fillStyle='#172635';ctx.beginPath();ctx.roundRect(-w*.28,h*.05,w*.56,h*.2,4);ctx.fill();
+ ctx.fillStyle='#fff3c4';ctx.fillRect(-w*.3,-h*.47,w*.16,4);ctx.fillRect(w*.14,-h*.47,w*.16,4);ctx.fillStyle='#ff3d4f';ctx.fillRect(-w*.3,h*.39,w*.16,4);ctx.fillRect(w*.14,h*.39,w*.16,4);
+ ctx.restore()}
+function project(lane,z,r){const t=Math.max(0,Math.min(1,z));const y=H*.22+t*H*.76;const half=(Math.min(W*.78,850))*(.12+.44*t);return {x:W/2+lane*half*.62,y,scale:.28+t*1.12,w:(W*.055+9)*(.28+t*1.12),h:(H*.105+12)*(.28+t*1.12)}}
+function draw(){ctx.clearRect(0,0,W,H);const r=road();
+ traffic.sort((a,b)=>a.z-b.z);for(const t of traffic){const q=project(t.lane,t.z);car(q.x,q.y,q.w*(t.type==='truck'?1.15:1),q.h*(t.type==='truck'?1.35:1),t.color)}
+ for(const c of coins){const q=project(c.lane,c.z);ctx.beginPath();ctx.arc(q.x,q.y,Math.max(3,9*q.scale),0,Math.PI*2);ctx.fillStyle='#ffd34e';ctx.fill();ctx.strokeStyle='#fff0a0';ctx.lineWidth=2;ctx.stroke()}
+ const arr=Object.values(players).sort((a,b)=>a.id.localeCompare(b.id));arr.forEach((p,i)=>{const q=project(p.x,1);car(q.x,q.y,Math.max(25,W*.045),Math.max(46,H*.10),p.color,p.steer*.08);if(p.boost>0){ctx.fillStyle='#5ee7ff';ctx.globalAlpha=.7;ctx.beginPath();ctx.moveTo(q.x-7,q.y+q.h*.45);ctx.lineTo(q.x,q.y+q.h*.9+Math.random()*10);ctx.lineTo(q.x+7,q.y+q.h*.45);ctx.fill();ctx.globalAlpha=1}ctx.fillStyle='#fff';ctx.font='bold 12px Tahoma';ctx.textAlign='center';ctx.fillText('P'+p.id.slice(1),q.x,q.y-q.h*.62)});
+ // subtle speed lines
+ if(arr.some(p=>p.speed>150)){ctx.strokeStyle='#ffffff18';for(let i=0;i<15;i++){let x=(i*97+world*4)%W,y=(i*137+world*7)%(H*.7);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y+20);ctx.stroke()}}
+}
+function update(dt){if(!started)return;elapsed+=dt;world+=dt*2;
+ if(Math.random()<dt*(.75+Object.keys(players).length*.25))spawn();
+ for(const p of Object.values(players)){const max=260+(p.boost>0?150:0);if(p.accel)p.speed+=dt*100;if(p.brake)p.speed-=dt*190;else if(!p.accel)p.speed-=dt*27;if(p.boost>0){p.speed+=dt*210;p.boost=Math.max(0,p.boost-dt)}p.speed=Math.max(0,Math.min(max,p.speed));if(p.steer)p.x+=p.steer*dt*(.8+p.speed/170);p.x=Math.max(-.94,Math.min(.94,p.x));p.score+=p.speed*dt*.012;p.nitro=Math.min(100,p.nitro+dt*(p.speed>60?2.5:1));p.handbrake=Math.max(0,(p.handbrake||0)-dt);p.best=Math.max(p.best,p.score)}
+ for(const t of traffic){t.z+=dt*(.13+Math.max(0,...Object.values(players).map(p=>p.speed))/900);for(const p of Object.values(players)){if(t.z>.79&&t.z<.99&&Math.abs(t.lane-p.x)<.19&&p.speed>30){p.speed*=.88;p.score=Math.max(0,p.score-1);t.z=1.2;shake=5}}}
+ for(const c of coins){c.z+=dt*.24;for(const p of Object.values(players)){if(c.z>.84&&c.z<1.03&&Math.abs(c.lane-p.x)<.22){p.score+=2;c.z=1.2}}}
+ traffic=traffic.filter(t=>t.z<1.15);coins=coins.filter(c=>c.z<1.15);
+}
+function ui(){const arr=Object.values(players);const avg=arr.length?arr.reduce((a,p)=>a+p.speed,0)/arr.length:0;const dist=arr.length?Math.max(...arr.map(p=>p.score)):0;$('distance').textContent=fa(dist)+' km';$('speed').textContent=fa(avg)+' km/h';const best=Math.max(0,...arr.map(p=>p.best));$('record').textContent=fa(best)+' km';$('players').innerHTML=arr.map(p=>`<div class="player"><b style="color:${p.color}">بازیکن ${p.id.slice(1)}</b>سرعت ${fa(p.speed)} · نیترو ${fa(p.nitro)}٪</div>`).join('')}
+function loop(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;update(dt);draw();ui();requestAnimationFrame(loop)}
+function startGame(){if(started)return;$('intro').style.display='none';started=true;player('p1');last=performance.now()}
+$('go').onclick=startGame;
+setTimeout(startGame,3500); // شروع خودکار؛ نمایشگر نیازی به لمس ندارد
+requestAnimationFrame(loop);
+})();
+</script>
+</body></html>

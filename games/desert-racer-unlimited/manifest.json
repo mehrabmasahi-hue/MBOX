@@ -1,0 +1,9 @@
+{
+  "id": "desert-racer-unlimited",
+  "name": "رانندگی بی‌پایان | Desert Racer",
+  "description": "بازی مسابقه‌ای و رانندگی آزاد برای ۱ تا ۴ بازیکن؛ مسیر بی‌پایان، نیترو، ترافیک و رکورد مسافت.",
+  "entry": "index.html",
+  "min_players": 1,
+  "max_players": 4,
+  "mode": "multi"
+}

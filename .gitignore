@@ -1,0 +1,21 @@
+# Gradle / Android build outputs
+.gradle/
+**/build/
+local.properties
+*.hprof
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local signing material and private environment files
+*.jks
+*.keystore
+keystore.properties
+.env
+.env.*
+
+# IDE / OS
+.idea/
+*.iml
+.DS_Store
+Thumbs.db

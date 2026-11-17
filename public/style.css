@@ -1,0 +1,15 @@
+*{box-sizing:border-box}
+body{margin:0;background:#090d1b;color:#f5f4ff;font-family:Tahoma,sans-serif;text-align:center}
+header{padding:16px;background:#151d34;border-bottom:1px solid #34405c;display:flex;justify-content:space-around;align-items:center}
+h1{color:#b89aff}main{max-width:650px;margin:auto;padding:20px}
+section{background:#141d32;padding:20px;border:1px solid #303e5e;border-radius:18px;margin-top:20px}
+input{display:block;width:100%;padding:14px;margin:12px 0;border-radius:10px;background:#0a1223;border:1px solid #405075;color:white}
+button{background:linear-gradient(100deg,#8055e9,#426fce);color:white;border:0;border-radius:12px;padding:13px 17px;margin:5px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.4}
+.code{padding:18px;background:#0b1428;border-radius:12px;font-size:24px;color:#c4a9ff}
+.player{padding:12px;background:#0c1629;border-radius:12px;margin:8px}
+#canvas{width:100%;height:auto;background:#080e1c;border-radius:14px;border:1px solid #455276}
+#controls{padding:15px;touch-action:none}
+#controls button{min-width:65px;min-height:55px;font-size:20px}
+label{display:block;padding:12px;color:#c6b3ff}
+</EOF>

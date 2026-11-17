@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090d1b">
+<title>M BOX</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header><h1>🎮 M BOX</h1><span id="status">در حال اتصال...</span></header>
+<main>
+<section id="home">
+<h2>به دنیای بازی خوش آمدی</h2>
+<input id="name" placeholder="نام بازیکن" value="بازیکن">
+<button onclick="createRoom()">ساخت اتاق نمایشگر</button>
+<button onclick="showJoin()">ورود به عنوان دسته</button>
+<h3>اتاق‌های فعال</h3>
+<div id="rooms"></div>
+</section>
+<section id="host" hidden>
+<button onclick="home()">بازگشت</button>
+<h2>اتاق مدیر</h2>
+<div class="code">کد اتاق: <b id="code"></b></div>
+<h3>درخواست بازیکنان</h3>
+<div id="players"></div>
+<h3>انتخاب بازی</h3>
+<button onclick="selectGame('race')">🏎️ مسابقه سرعت</button>
+<button onclick="selectGame('coop')">⭐ جمع‌آوری ستاره</button>
+<label>فایل بازی 123t<input type="file" id="file" accept=".123t,application/json"></label>
+<p id="gameName">بازی انتخاب نشده</p>
+<button id="start" onclick="startGame()" disabled>شروع بازی</button>
+</section>
+<section id="join" hidden>
+<button onclick="home()">بازگشت</button>
+<h2>انتخاب نمایشگر</h2>
+<input id="roomCode" placeholder="کد شش رقمی" inputmode="numeric">
+<button onclick="joinRoom()">ورود به اتاق</button>
+<div id="wait">در انتظار...</div>
+</section>
+<section id="game" hidden>
+<h2 id="gameTitle">بازی</h2>
+<canvas id="canvas" width="900" height="520"></canvas>
+<div id="controls">
+<button onclick="move('up')">▲</button>
+<div><button onclick="move('left')">◀</button>
+<button onclick="move('down')">▼</button>
+<button onclick="move('right')">▶</button></div>
+<button onclick="move('action')">عمل ●</button>
+</div>
+<button id="end" onclick="endGame()">پایان بازی</button>
+</section>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

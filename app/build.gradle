@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.goldan.mbox'
+    compileSdk 37
+
+    defaultConfig {
+        applicationId 'com.goldan.mbox'
+        minSdk 26
+        targetSdk 37
+        versionCode 1
+        versionName '1.0.0'
+    }
+
+    flavorDimensions += 'edition'
+    productFlavors {
+        controller {
+            dimension 'edition'
+            applicationIdSuffix '.controller'
+            resValue 'string', 'app_name', 'M BOX Controller'
+            buildConfigField 'String', 'APP_ROLE', '"controller"'
+        }
+        display {
+            dimension 'edition'
+            applicationIdSuffix '.display'
+            resValue 'string', 'app_name', 'M BOX Display'
+            buildConfigField 'String', 'APP_ROLE', '"display"'
+        }
+    }
+
+    buildFeatures { buildConfig true }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    packaging { resources { excludes += ['/META-INF/{AL2.0,LGPL2.1}'] } }
+}

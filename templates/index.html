@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#090d18"><title>M BOX</title>
+<link rel="stylesheet" href="/static/css/style.css">
+
+</head>
+<body>
+<div class="top"><div class="brand"><span class="logo">M</span><div><b>M BOX</b><small>LOCAL GAME SYSTEM</small></div></div><span id="net" class="pill">در حال اتصال...</span></div>
+<main id="app">
+<section id="home" class="screen">
+ <div class="hero"><div class="eyebrow">YOUR LOCAL GAMING HUB</div><h1>بازی، <span>بدون محدودیت</span></h1><p>یک نمایشگر؛ چهار دسته؛ یک شبکه محلی.</p></div>
+ <div class="choice-grid">
+  <button class="choice" id="displayChoice"><span class="bigicon">▣</span><b>نمایشگر</b><small>ساخت اتاق و نمایش تصویر بازی</small></button>
+  <button class="choice" id="controllerChoice"><span class="bigicon">⌘</span><b>دسته بازی</b><small>اتصال به اتاق و کنترل بازی</small></button>
+ </div>
+ <div class="footnote">برای استفاده، همه دستگاه‌ها باید به یک Wi-Fi متصل باشند.</div>
+</section>
+<section id="displaySetup" class="screen hidden">
+ <button class="back" data-back>← بازگشت</button><h2>ساخت اتاق بازی</h2><label>نام مدیر / بازیکن اول</label><input id="managerName" maxlength="24" value="مدیر">
+ <label>نام اتاق</label><input id="roomTitle" maxlength="32" value="اتاق بازی من">
+ <button class="primary" id="createRoom">ساخت اتاق و ورود به دسته مدیر</button>
+</section>
+<section id="displayPanel" class="screen hidden">
+ <div class="row between"><div><span class="eyebrow">DISPLAY HOST</span><h2 id="roomHeading">اتاق بازی</h2></div><span class="pill live">میزبان</span></div>
+ <div class="room-code"><small>کد ورود بازیکنان</small><strong id="roomCode">------</strong></div>
+ <div class="panel"><h3>بازیکنان <span id="playerCount">1/4</span></h3><div id="players"></div></div>
+ <div class="panel"><h3>درخواست‌های ورود</h3><div id="requests"><small class="muted">درخواستی وجود ندارد.</small></div></div>
+ <div class="panel"><div class="row between"><h3>انتخاب بازی</h3><label class="upload">＋ بارگذاری 123T<input type="file" id="uploadFile" accept=".123t"></label></div><div id="games" class="games"></div></div>
+ <button class="primary" id="startGame" disabled>شروع بازی</button>
+ <div class="row"><button class="secondary" id="openManagerPad">باز کردن دسته مدیر</button><button class="danger" id="stopGame">توقف بازی</button></div>
+ <div id="displayStage" class="stage hidden"><div class="stagebar"><b>صفحه بازی M BOX</b><button id="exitStage">خروج از بازی</button></div><iframe id="gameFrame" sandbox="allow-scripts" title="صفحه نمایش بازی"></iframe></div>
+</section>
+<section id="controllerSetup" class="screen hidden">
+ <button class="back" data-back>← بازگشت</button><h2>اتصال دسته بازی</h2><label>نام بازیکن</label><input id="playerName" maxlength="24" value="بازیکن">
+ <label>کد اتاق</label><input id="joinCode" maxlength="6" placeholder="مثلاً A1B2C3" autocapitalize="characters">
+ <button class="primary" id="joinRoom">ارسال درخواست ورود</button><div id="joinStatus" class="notice hidden"></div>
+</section>
+<section id="controllerPanel" class="screen hidden">
+ <div class="row between"><div><span class="eyebrow">CONTROLLER</span><h2 id="playerHeading">دسته بازی</h2></div><span class="pill live" id="playerNumber">بازیکن</span></div>
+ <div id="waiting" class="waiting"><div class="loader"></div><h3>در انتظار شروع بازی</h3><p>مدیر اتاق پس از آماده‌سازی، بازی را شروع می‌کند.</p></div>
+ <div id="pad" class="pad hidden">
+  <div class="dpad"><button data-key="UP">▲</button><div><button data-key="LEFT">◀</button><button data-key="DOWN">▼</button><button data-key="RIGHT">▶</button></div></div>
+  <div class="abxy"><button data-key="Y">Y</button><div><button data-key="X">X</button><button data-key="B">B</button></div><button data-key="A">A</button></div>
+  <div class="shoulders"><button data-key="L">L</button><button data-key="SELECT">SELECT</button><button data-key="START">START</button><button data-key="R">R</button></div>
+  <div class="hint">برای بازی، دکمه‌ها را لمس کنید. تصویر بازی فقط روی نمایشگر اصلی نشان داده می‌شود.</div>
+ </div>
+</section>
+</main>
+<script src="/static/js/app.js"></script>
+</body></html>

@@ -1,0 +1,7 @@
+<!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#111b31,#090d18);color:#fff;font-family:system-ui;text-align:center;padding:5vh 4vw}h1{color:#4ce5d5;font-size:clamp(28px,6vw,52px)}.arena{max-width:700px;margin:30px auto;display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.p{background:#192944;border:1px solid #365274;border-radius:18px;padding:18px}.p strong{display:block;font-size:40px;color:#4ce5d5}.sub{color:#9aabc5}</style><h1>⚡ میدان ضربه</h1><p>در ۳۰ ثانیه با فشردن A بیشترین امتیاز را بگیر!</p><h2 id="time">۳۰</h2><div class="arena" id="arena"></div><p class="sub" id="status">بازی شروع شد؛ دکمه A را فشار دهید.</p>
+<script>
+const scores={};let left=30,active=true;function draw(){document.getElementById('arena').innerHTML=Object.keys(scores).sort().map(id=>`<div class="p">بازیکن ${id.slice(1)}<strong>${scores[id]}</strong>امتیاز</div>`).join('')}
+window.addEventListener('message',e=>{const d=e.data;if(!active||d?.type!=='MBOX_INPUT'||d.input?.button!=='A'||d.input?.action!=='down')return;scores[d.player_id]=(scores[d.player_id]||0)+1;draw()});
+const clock=setInterval(()=>{left--;document.getElementById('time').textContent=left;if(left<=0){active=false;clearInterval(clock);const winner=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];document.getElementById('status').textContent=winner?'برنده: بازیکن '+winner[0].slice(1):'بازی تمام شد';}},1000);draw();
+</script></html>

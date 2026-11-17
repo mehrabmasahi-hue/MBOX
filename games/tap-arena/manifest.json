@@ -1,0 +1,9 @@
+{
+  "id": "tap-arena",
+  "name": "میدان ضربه",
+  "description": "رقابت امتیازی؛ هر بازیکن با دکمه A امتیاز می‌گیرد.",
+  "entry": "index.html",
+  "min_players": 1,
+  "max_players": 4,
+  "mode": "multi"
+}

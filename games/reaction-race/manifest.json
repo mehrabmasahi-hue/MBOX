@@ -1,0 +1,9 @@
+{
+  "id": "reaction-race",
+  "name": "مسابقه واکنش",
+  "description": "هر بازیکن با دیدن پیام شروع، سریع‌تر دکمه A را می‌زند.",
+  "entry": "index.html",
+  "min_players": 2,
+  "max_players": 4,
+  "mode": "multi"
+}
